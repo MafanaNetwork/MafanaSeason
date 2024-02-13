@@ -1,0 +1,4 @@
+name: MafanaSeasons
+version: '${project.version}'
+main: me.tahacheji.mafana.MafanaSeasons
+api-version: '1.20'
