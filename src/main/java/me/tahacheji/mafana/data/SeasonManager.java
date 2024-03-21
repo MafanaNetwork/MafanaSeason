@@ -99,6 +99,17 @@ public class SeasonManager implements Listener {
         Bukkit.getPluginManager().callEvent(new MSNextSeasonEventEvent(world, currentSeason, currentSeason, seasonEvent, oldEvent, daysPassed));
     }
 
+    public void nextSeasonEventEvent(SeasonEvent s) {
+        seasonEventDaysPassed = 0;
+        seasonEvent.onDisable(world);
+        SeasonEvent oldEvent = seasonEvent;
+        seasonEvent = s;
+        if (seasonEvent != null) {
+            seasonEvent.onEnable(world);
+        }
+        Bukkit.getPluginManager().callEvent(new MSNextSeasonEventEvent(world, currentSeason, currentSeason, seasonEvent, oldEvent, daysPassed));
+    }
+
     public void nextSeasonEvent() {
         daysPassed = 0;
         currentSeason.onDisable(world);
@@ -106,6 +117,19 @@ public class SeasonManager implements Listener {
         SeasonEvent oldEvent = seasonEvent;
         if(selectNewSeason() != null) {
             currentSeason = selectNewSeason();
+            currentSeason.onEnable(world);
+            seasonEvent = selectEventWithPercentage(currentSeason.getSeasonEvents());
+        }
+        Bukkit.getPluginManager().callEvent(new MSNextSeasonEvent(world, currentSeason, oldSeason, seasonEvent, oldEvent, daysPassed));
+    }
+
+    public void nextSeasonEvent(Season season) {
+        daysPassed = 0;
+        currentSeason.onDisable(world);
+        Season oldSeason = currentSeason;
+        SeasonEvent oldEvent = seasonEvent;
+        if(selectNewSeason() != null) {
+            currentSeason = season;
             currentSeason.onEnable(world);
             seasonEvent = selectEventWithPercentage(currentSeason.getSeasonEvents());
         }

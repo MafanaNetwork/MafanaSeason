@@ -19,7 +19,7 @@ public class Winter extends Season {
 
     @Override
     public boolean onEnable(World world) {
-        WorldBiomeSetter worldBiomeSetter = new WorldBiomeSetter(world, MafanaSeasons.getInstance().getLocationX(), MafanaSeasons.getInstance().getLocationY(), 4, 200, Biome.SNOWY_TAIGA);
+        WorldBiomeSetter worldBiomeSetter = new WorldBiomeSetter(world, MafanaSeasons.getInstance().getLocationX(), MafanaSeasons.getInstance().getLocationY(), 3, 150, Biome.SNOWY_TAIGA);
         CompletableFuture<Void> w = worldBiomeSetter.setBiomeAsync();
         w.thenAccept(e -> {
             System.out.print(ChatColor.GREEN + "Updated Biome");

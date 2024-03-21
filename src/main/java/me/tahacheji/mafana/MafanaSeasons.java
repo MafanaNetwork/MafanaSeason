@@ -26,8 +26,8 @@ public final class MafanaSeasons extends JavaPlugin {
     private SeasonDatabase seasonDatabase;
     private SeasonManager seasonManager;
 
-    private Location locationX = new Location(Bukkit.getWorld("world"), 2584,136,3373);
-    private Location locationY = new Location(Bukkit.getWorld("world"), 2059,-63,2844);
+    private Location locationX = new Location(Bukkit.getWorld("world"), 2060,150,3372);
+    private Location locationY = new Location(Bukkit.getWorld("world"), 2584,-63,2844);
 
     @Override
     public void onEnable() {
@@ -51,8 +51,8 @@ public final class MafanaSeasons extends JavaPlugin {
         seasonManager = new SeasonManager(Bukkit.getWorld("world"), 600);
         seasonManager.registerListener();
         seasonManager.start();
-        CommandHandler.registerCommands(PlayerCommand.class);
-        CommandHandler.registerCommands(AdminCommand.class);
+        CommandHandler.registerCommands(PlayerCommand.class, this);
+        CommandHandler.registerCommands(AdminCommand.class, this);
         getServer().getPluginManager().registerEvents(new PlayerJoin(), this);
     }
 
@@ -68,6 +68,15 @@ public final class MafanaSeasons extends JavaPlugin {
 
     public Season getSeason(String id) {
         for(Season s : getSeasonList()) {
+            if(s.getId().equalsIgnoreCase(id)) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    public SeasonEvent getSeasonEvent(String id) {
+        for(SeasonEvent s : getSeasonEvents()) {
             if(s.getId().equalsIgnoreCase(id)) {
                 return s;
             }

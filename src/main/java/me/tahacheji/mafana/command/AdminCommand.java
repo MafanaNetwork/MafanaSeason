@@ -3,6 +3,8 @@ package me.tahacheji.mafana.command;
 import me.tahacheji.mafana.MafanaSeasons;
 import me.tahacheji.mafana.commandExecutor.Command;
 import me.tahacheji.mafana.commandExecutor.paramter.Param;
+import me.tahacheji.mafana.data.Season;
+import me.tahacheji.mafana.data.SeasonEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -20,6 +22,24 @@ public class AdminCommand {
     public void skipSeason(Player player) {
         MafanaSeasons.getInstance().getSeasonManager().nextSeasonEvent();
         player.sendMessage(ChatColor.GREEN + "Skipped Season!");
+    }
+
+    @Command(names = "ms setSeason", permission = "mafana.admin")
+    public void setSeason(Player player, @Param(name = "seasonID") String seasonID) {
+        Season season = MafanaSeasons.getInstance().getSeason(seasonID);
+        if(season != null) {
+            MafanaSeasons.getInstance().getSeasonManager().nextSeasonEvent(season);
+            player.sendMessage(ChatColor.GREEN + "Set Season!");
+        }
+    }
+
+    @Command(names = "ms setSeasonEvent", permission = "mafana.admin")
+    public void setSeasonEvent(Player player, @Param(name = "seasonEventID") String seasonEventID) {
+        SeasonEvent season = MafanaSeasons.getInstance().getSeasonEvent(seasonEventID);
+        if(season != null) {
+            MafanaSeasons.getInstance().getSeasonManager().nextSeasonEventEvent(season);
+            player.sendMessage(ChatColor.GREEN + "Set Season Event!");
+        }
     }
 
     @Command(names = "ms skipEvent", permission = "mafana.admin")

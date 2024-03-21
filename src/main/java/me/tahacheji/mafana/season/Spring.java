@@ -19,7 +19,7 @@ public class Spring extends Season {
 
     @Override
     public boolean onEnable(World world) {
-        WorldBiomeSetter worldBiomeSetter = new WorldBiomeSetter(world, MafanaSeasons.getInstance().getLocationX(), MafanaSeasons.getInstance().getLocationY(), 4, 200, Biome.WARM_OCEAN);
+        WorldBiomeSetter worldBiomeSetter = new WorldBiomeSetter(world, MafanaSeasons.getInstance().getLocationX(), MafanaSeasons.getInstance().getLocationY(), 3, 200, Biome.WARM_OCEAN);
         CompletableFuture<Void> w = worldBiomeSetter.setBiomeAsync();
         w.thenAccept(e -> {
             System.out.print(ChatColor.GREEN + "Updated Biome");
