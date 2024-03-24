@@ -59,7 +59,7 @@ public final class MafanaSeasons extends JavaPlugin {
     @Override
     public void onDisable() {
         seasonManager.stop();
-        seasonDatabase.disconnect();
+        seasonDatabase.close();
     }
 
     public SeasonManager getSeasonManager() {

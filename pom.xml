@@ -76,20 +76,21 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.MaskedWasTaken</groupId>
-            <artifactId>MafanaMysqlAPI-Remake</artifactId>
-            <version>1.9</version>
+            <groupId>com.github.MafanaNetwork</groupId>
+            <artifactId>MafanaDatabaseAPI</artifactId>
+            <version>0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.MaskedWasTaken</groupId>
+            <groupId>com.github.MafanaNetwork</groupId>
             <artifactId>MafanaCommandNetwork</artifactId>
             <version>1.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.MaskedWasTaken</groupId>
+            <groupId>com.github.MafanaNetwork</groupId>
             <artifactId>MafanaNetwork</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -98,9 +99,9 @@
             <version>0.9.12</version>
         </dependency>
         <dependency>
-            <groupId>com.github.MaskedWasTaken</groupId>
+            <groupId>com.github.MafanaNetwork</groupId>
             <artifactId>MafanaWorldProcessor</artifactId>
-            <version>2.7</version>
+            <version>3.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

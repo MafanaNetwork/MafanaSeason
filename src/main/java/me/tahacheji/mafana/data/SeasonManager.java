@@ -12,6 +12,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 public class SeasonManager implements Listener {
 
@@ -22,10 +23,10 @@ public class SeasonManager implements Listener {
 
     private BukkitTask runnable;
 
-    private Season currentSeason = getSeason(seasonsMysql.getSeason());
+    private Season currentSeason = getSeason("");
     private SeasonEvent seasonEvent = null;
 
-    private int daysPassed = seasonsMysql.getDay();
+    private int daysPassed = 0;
     private int seasonEventDaysPassed = 0;
 
     private int secondsPassed = 0;
@@ -35,32 +36,40 @@ public class SeasonManager implements Listener {
     public SeasonManager(World world, int howLongDayLastInSec) {
         this.world = world;
         this.howLongDayLastInSec = howLongDayLastInSec;
+        CompletableFuture.supplyAsync(() -> {
+           currentSeason = getSeason(seasonsMysql.getSeason().join());
+            daysPassed = seasonsMysql.getDay().join();
+            return null;
+        });
     }
 
     public void start() {
-        long scaledDayLengthTicks = howLongDayLastInSec * 20L;
+        long ticksPerMinecraftDay = 24000L;
 
         runnable = new BukkitRunnable() {
             @Override
             public void run() {
                 if (!paused) {
                     secondsPassed++;
-                    if(seasonEvent != null) {
+                    if (seasonEvent != null) {
                         seasonEvent.whileThere(world);
                     }
                     currentSeason.whileThere(world);
 
-                    long ticksPerMinecraftDay = 24000L;
-                    long time = (long)((double)secondsPassed / (double)scaledDayLengthTicks * ticksPerMinecraftDay);
-                    world.setTime(time % ticksPerMinecraftDay);
+                    long totalTicks = (secondsPassed * 20L) % (howLongDayLastInSec * 20L);
+
+                    long time = totalTicks * ticksPerMinecraftDay / (howLongDayLastInSec * 20L);
+
+                    Bukkit.getScheduler().runTask(MafanaSeasons.getInstance(), () ->  world.setTime(time));
 
                     if (secondsPassed >= howLongDayLastInSec) {
                         nextDayEvent();
                     }
                 }
             }
-        }.runTaskTimer(MafanaSeasons.getInstance(), 0L, 20L);
+        }.runTaskTimerAsynchronously(MafanaSeasons.getInstance(), 0L, 20L);
     }
+
 
 
     public void stop() {
@@ -73,7 +82,7 @@ public class SeasonManager implements Listener {
         secondsPassed = 0;
         daysPassed++;
         currentSeason.dayPassed(world);
-        Bukkit.getPluginManager().callEvent(new MSNextDayEvent(world, currentSeason, seasonEvent, daysPassed));
+        Bukkit.getScheduler().runTask(MafanaSeasons.getInstance(), () ->  Bukkit.getPluginManager().callEvent(new MSNextDayEvent(world, currentSeason, seasonEvent, daysPassed)));
         if (seasonEvent != null) {
             seasonEvent.dayPassed(world);
             seasonEventDaysPassed++;
@@ -96,7 +105,7 @@ public class SeasonManager implements Listener {
         if (seasonEvent != null) {
             seasonEvent.onEnable(world);
         }
-        Bukkit.getPluginManager().callEvent(new MSNextSeasonEventEvent(world, currentSeason, currentSeason, seasonEvent, oldEvent, daysPassed));
+        Bukkit.getScheduler().runTask(MafanaSeasons.getInstance(), () ->  Bukkit.getPluginManager().callEvent(new MSNextSeasonEventEvent(world, currentSeason, currentSeason, seasonEvent, oldEvent, daysPassed)));
     }
 
     public void nextSeasonEventEvent(SeasonEvent s) {
@@ -107,7 +116,7 @@ public class SeasonManager implements Listener {
         if (seasonEvent != null) {
             seasonEvent.onEnable(world);
         }
-        Bukkit.getPluginManager().callEvent(new MSNextSeasonEventEvent(world, currentSeason, currentSeason, seasonEvent, oldEvent, daysPassed));
+        Bukkit.getScheduler().runTask(MafanaSeasons.getInstance(), () ->  Bukkit.getPluginManager().callEvent(new MSNextSeasonEventEvent(world, currentSeason, currentSeason, seasonEvent, oldEvent, daysPassed)));
     }
 
     public void nextSeasonEvent() {
@@ -120,7 +129,7 @@ public class SeasonManager implements Listener {
             currentSeason.onEnable(world);
             seasonEvent = selectEventWithPercentage(currentSeason.getSeasonEvents());
         }
-        Bukkit.getPluginManager().callEvent(new MSNextSeasonEvent(world, currentSeason, oldSeason, seasonEvent, oldEvent, daysPassed));
+        Bukkit.getScheduler().runTask(MafanaSeasons.getInstance(), () ->  Bukkit.getPluginManager().callEvent(new MSNextSeasonEvent(world, currentSeason, oldSeason, seasonEvent, oldEvent, daysPassed)));
     }
 
     public void nextSeasonEvent(Season season) {
@@ -133,7 +142,7 @@ public class SeasonManager implements Listener {
             currentSeason.onEnable(world);
             seasonEvent = selectEventWithPercentage(currentSeason.getSeasonEvents());
         }
-        Bukkit.getPluginManager().callEvent(new MSNextSeasonEvent(world, currentSeason, oldSeason, seasonEvent, oldEvent, daysPassed));
+        Bukkit.getScheduler().runTask(MafanaSeasons.getInstance(), () ->  Bukkit.getPluginManager().callEvent(new MSNextSeasonEvent(world, currentSeason, oldSeason, seasonEvent, oldEvent, daysPassed)));
     }
 
     private Season selectNewSeason() {

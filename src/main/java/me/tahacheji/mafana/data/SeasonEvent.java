@@ -4,7 +4,7 @@ import java.util.List;
 
 public class SeasonEvent implements SeasonTriggers {
 
-    private String id;
+    private final String id;
     private String displayName;
     private Season season;
     private int amountOfDays;

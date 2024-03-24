@@ -1,12 +1,10 @@
 package me.tahacheji.mafana.data;
 
-import me.TahaCheji.mysqlData.MySQL;
-import me.TahaCheji.mysqlData.MysqlValue;
-import me.TahaCheji.mysqlData.SQLGetter;
 import me.tahacheji.mafana.MafanaSeasons;
 import me.tahacheji.mafana.util.EncryptionUtil;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class SeasonDatabase extends MySQL {
 
@@ -19,34 +17,34 @@ public class SeasonDatabase extends MySQL {
 
     SQLGetter sqlGetter = new SQLGetter(this);
 
-    public int getDay() {
-        return sqlGetter.getInt(uuid, new MysqlValue("DAY"));
+    public CompletableFuture<Integer> getDay() {
+        return sqlGetter.getIntAsync(uuid, new DatabaseValue("DAY"));
     }
 
-    public String getSeason() {
-        return sqlGetter.getString(uuid, new MysqlValue("SEASON"));
+    public CompletableFuture<String> getSeason() {
+        return sqlGetter.getStringAsync(uuid, new DatabaseValue("SEASON"));
     }
 
-    public void setSeason(String s) {
-        sqlGetter.setString(new MysqlValue("SEASON", uuid, s));
+    public CompletableFuture<Void> setSeason(String s) {
+        return sqlGetter.setStringAsync(new DatabaseValue("SEASON", uuid, s));
     }
 
-    public void setDay(int i) {
-        sqlGetter.setInt(new MysqlValue("DAY", uuid, i));
+    public CompletableFuture<Void> setDay(int i) {
+        return sqlGetter.setIntAsync(new DatabaseValue("DAY", uuid, i));
     }
 
-    @Override
-    public void connect() {
-        super.connect();
-        if(this.isConnected())
+    public CompletableFuture<Void> connect() {
+        return CompletableFuture.supplyAsync(() -> {
             sqlGetter.createTable("mafana_seasons",
-                    new MysqlValue("SEASON", ""),
-                    new MysqlValue("DAY", 0));
+                    new DatabaseValue("SEASON", ""),
+                    new DatabaseValue("DAY", 0));
 
-        if(!sqlGetter.exists(uuid)) {
-            sqlGetter.setString(new MysqlValue("SEASON", uuid, MafanaSeasons.getInstance().getSeasonList().get(0).getId()));
-            sqlGetter.setInt(new MysqlValue("DAY", uuid, 0));
-            sqlGetter.setUUID(new MysqlValue("SERVER", uuid, uuid));
-        }
+            if(!sqlGetter.existsAsync(uuid).join()) {
+                return sqlGetter.setStringAsync(new DatabaseValue("SEASON", uuid, MafanaSeasons.getInstance().getSeasonList().get(0).getId()))
+                        .thenCompose(__ -> sqlGetter.setIntAsync(new DatabaseValue("DAY", uuid, 0)))
+                        .thenCompose(__ -> sqlGetter.setUUIDAsync(new DatabaseValue("SERVER", uuid, uuid))).join();
+            }
+            return null;
+        });
     }
 }
